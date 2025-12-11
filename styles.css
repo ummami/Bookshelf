@@ -25,6 +25,23 @@
   --shadow: rgba(192, 132, 252, 0.15);
   --glow: rgba(192, 132, 252, 0.4);
 }
+.welcome-text {
+  max-width: 900px;           /* wider block */
+  font-size: 1.15rem;         /* slightly larger text */
+  line-height: 1.9;           /* prettier spacing */
+  margin: 1rem 0 2.5rem 0;    /* better spacing around */
+  color: var(--text-muted);   /* matches your aesthetic */
+  padding-left: 1rem;         /* lines up with title bar */
+}
+.welcome-text:hover {
+  color: #4da6ff;                 /* soft neon blue */
+  transition: color 0.3s ease;    /* smooth fade */
+}
+.welcome-text:hover {
+  color: #4da6ff;
+  text-shadow: 0 0 8px #4da6ff;
+  transition: all 0.3s ease;
+}
 
 body {
   font-family: 'Space Mono', 'Courier New', monospace;
