@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bookshelf</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Bookshelf lets you search the Open Library catalog, add books to your shelves, rate them, and write quick reviews in a polished web app."
+  />
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-inner">
+      <div class="nav-left">
+        <div class="logo" style="cursor: pointer;">
+  <span>BOOKSHELF</span>
+</div>
+        <div class="nav-links">
+          <button id="homeNav" class="nav-link nav-link-active">Home</button>
+          <button id="libraryNav" class="nav-link">Library</button>
+        </div>
+      </div>
+      <div class="nav-right">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search books..."
+          class="search-input"
+        />
+        <button id="searchButton" class="btn btn-primary">Search</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main">
+    <section id="homeView">
+      <div id="recentContainer" class="section-block hidden">
+        <h2 class="section-title">Your Recent Books</h2>
+        <div id="recentGrid" class="card-grid"></div>
+      </div>
+
+      <div class="section-block">
+        <h2 class="section-title">Trending Books</h2>
+        <div id="trendingGrid" class="card-grid"></div>
+      </div>
+    </section>
+
+    <section id="searchView" class="hidden">
+      <h2 class="section-title">Search Results</h2>
+      <div id="searchGrid" class="card-grid"></div>
+    </section>
+
+    <section id="libraryView" class="hidden">
+      <div class="section-block">
+        <h2 class="section-title">My Library</h2>
+        <div class="shelf-filters">
+          <button class="shelf-filter shelf-filter-active" data-shelf="all">All</button>
+          <button class="shelf-filter" data-shelf="finished">Finished</button>
+          <button class="shelf-filter" data-shelf="reading">Reading</button>
+          <button class="shelf-filter" data-shelf="wantToRead">Want to Read</button>
+        </div>
+      </div>
+      <div id="libraryStats" class="library-stats hidden">
+        <p id="libraryStatsText" class="library-stats-text"></p>
+      </div>
+      <div id="libraryEmpty" class="empty-state">
+        <p class="empty-text">No books in your library yet. Search for a book and add it!</p>
+      </div>
+      <div id="libraryGrid" class="card-grid"></div>
+    </section>
+
+    <section id="detailView" class="hidden">
+      <button id="backFromDetail" class="btn btn-secondary" style="margin-bottom: 2rem;">← Back</button>
+      <div id="detailContent"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p class="footer-title">About Bookshelf</p>
+      <p class="footer-text">
+        Bookshelf lets you search for books using the Open Library API, save them to your personal shelves,
+        rate what you read, and jot down quick reviews so you never forget what you thought.
+      </p>
+    </div>
+  </footer>
+
+  <div id="shelfModalBackdrop" class="modal-backdrop hidden">
+    <div class="modal">
+      <h3 class="modal-title">Add to Shelf</h3>
+      <p id="shelfModalTitle" class="modal-subtitle"></p>
+      <div class="modal-actions" style="flex-direction: column;">
+        <button class="btn btn-finished modal-btn" data-shelf="finished">Finished</button>
+        <button class="btn btn-reading modal-btn" data-shelf="reading">Reading</button>
+        <button class="btn btn-want modal-btn" data-shelf="wantToRead">Want to Read</button>
+        <button class="btn btn-secondary modal-btn" id="cancelShelfButton">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="ratingModalBackdrop" class="modal-backdrop hidden">
+    <div class="modal">
+      <h3 class="modal-title">Rate this book</h3>
+      <p id="ratingModalTitle" class="modal-subtitle"></p>
+      <div class="modal-stars">
+        <button class="modal-star-button" data-star="1">
+          <span class="star-icon-large">★</span>
+        </button>
+        <button class="modal-star-button" data-star="2">
+          <span class="star-icon-large">★</span>
+        </button>
+        <button class="modal-star-button" data-star="3">
+          <span class="star-icon-large">★</span>
+        </button>
+        <button class="modal-star-button" data-star="4">
+          <span class="star-icon-large">★</span>
+        </button>
+        <button class="modal-star-button" data-star="5">
+          <span class="star-icon-large">★</span>
+        </button>
+      </div>
+      <div class="modal-actions">
+        <button id="saveRatingButton" class="btn btn-primary modal-btn">Save Rating</button>
+        <button id="cancelRatingButton" class="btn btn-secondary modal-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="reviewModalBackdrop" class="modal-backdrop hidden">
+    <div class="modal">
+      <h3 class="modal-title">Write a review</h3>
+      <p id="reviewModalTitle" class="modal-subtitle"></p>
+      <textarea
+        id="reviewTextarea"
+        class="review-modal-textarea"
+        placeholder="Type your thoughts about this book..."
+      ></textarea>
+      <div class="modal-actions">
+        <button id="saveReviewButton" class="btn btn-primary modal-btn">Save Review</button>
+        <button id="cancelReviewButton" class="btn btn-secondary modal-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
