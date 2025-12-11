@@ -4,6 +4,29 @@ let selectedBook = null;
 let chosenRating = 0;
 let currentShelf = 'all';
 let previousView = 'home';
+const STORAGE_KEY = "bookshelfLibraryV1";
+
+function loadLibraryFromStorage() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      library = parsed;
+    }
+  } catch (err) {
+    console.error("Error loading library from storage", err);
+  }
+}
+
+function saveLibraryToStorage() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(library));
+  } catch (err) {
+    console.error("Error saving library to storage", err);
+  }
+}
 
 const trendingBooks = [
   { title: "Dune", authors: ["Frank Herbert"], rating: 0, cover: "https://covers.openlibrary.org/b/isbn/0441172717-M.jpg" },
@@ -93,18 +116,22 @@ function initEventListeners() {
   });
 
   document.getElementById("saveRatingButton").addEventListener("click", () => {
-    if (chosenRating > 0) {
-      const book = library.find(b => b.title === selectedBook);
-      if (book) {
-        book.rating = chosenRating;
-      }
-      alert(`Rated "${selectedBook}" ${chosenRating} stars!`);
-      loadHomePage();
-      renderLibrary();
-      showBookDetail(selectedBook.replace(/'/g, "\\'").replace(/"/g, "&quot;"));
+  if (chosenRating > 0) {
+    const book = library.find((b) => b.title === selectedBook);
+    if (book) {
+      book.rating = chosenRating;
+      saveLibraryToStorage();   
     }
-    ratingModalBackdrop.classList.add("hidden");
-  });
+    alert(`Rated "${selectedBook}" ${chosenRating} stars!`);
+    loadHomePage();
+    renderLibrary();
+    showBookDetail(
+      selectedBook.replace(/'/g, "\\'").replace(/"/g, "&quot;")
+    );
+  }
+  ratingModalBackdrop.classList.add("hidden");
+});
+
 
   document.getElementById("cancelRatingButton").addEventListener("click", () => {
     ratingModalBackdrop.classList.add("hidden");
@@ -117,18 +144,22 @@ function initEventListeners() {
   });
 
   
-  saveReviewButton.addEventListener("click", () => {
-    const text = reviewTextarea.value.trim();
-    const book = library.find(b => b.title === selectedBook);
-    if (book && text) {
-      book.review = text;
-      alert(`Saved your review for "${selectedBook}".`);
-      loadHomePage();
-      renderLibrary();
-      showBookDetail(selectedBook.replace(/'/g, "\\'").replace(/"/g, "&quot;"));
-    }
-    reviewModalBackdrop.classList.add("hidden");
-  });
+saveReviewButton.addEventListener("click", () => {
+  const text = reviewTextarea.value.trim();
+  const book = library.find((b) => b.title === selectedBook);
+  if (book && text) {
+    book.review = text;
+    saveLibraryToStorage();     
+    alert(`Saved your review for "${selectedBook}".`);
+    loadHomePage();
+    renderLibrary();
+    showBookDetail(
+      selectedBook.replace(/'/g, "\\'").replace(/"/g, "&quot;")
+    );
+  }
+  reviewModalBackdrop.classList.add("hidden");
+});
+
 
   cancelReviewButton.addEventListener("click", () => {
     reviewModalBackdrop.classList.add("hidden");
@@ -330,13 +361,15 @@ window.openReviewModal = function(title) {
   reviewModalBackdrop.classList.remove("hidden");
 };
 
-window.removeFromLibrary = function(title) {
+window.removeFromLibrary = function (title) {
   const unescapedTitle = title.replace(/\\'/g, "'");
-  library = library.filter(b => b.title !== unescapedTitle);
+  library = library.filter((b) => b.title !== unescapedTitle);
   alert(`"${unescapedTitle}" removed from library!`);
+  saveLibraryToStorage();       
   loadHomePage();
   renderLibrary();
 };
+
 
 window.showBookDetail = function(title) {
   const unescapedTitle = title.replace(/\\'/g, "'");
@@ -456,30 +489,31 @@ window.showBookDetail = function(title) {
 };
 
 function addToLibrary(title, shelf) {
-  const unescapedTitle = typeof title === 'string' ? title.replace(/\\'/g, "'") : title;
-  
-  let book = trendingBooks.find(b => b.title === unescapedTitle);
-  
+  const unescapedTitle =
+    typeof title === "string" ? title.replace(/\\'/g, "'") : title;
+
+  let book = trendingBooks.find((b) => b.title === unescapedTitle);
+
   if (!book) {
-    const allCards = document.querySelectorAll('.book-card-title');
-    allCards.forEach(card => {
+    const allCards = document.querySelectorAll(".book-card-title");
+    allCards.forEach((card) => {
       if (card.textContent === unescapedTitle) {
-        const cardEl = card.closest('.book-card');
-        const img = cardEl.querySelector('.book-card-image');
-        const authors = cardEl.querySelector('.book-card-authors');
+        const cardEl = card.closest(".book-card");
+        const img = cardEl.querySelector(".book-card-image");
+        const authors = cardEl.querySelector(".book-card-authors");
         book = {
           title: unescapedTitle,
           authors: [authors.textContent],
           cover: img.src,
-          rating: 0
+          rating: 0,
         };
       }
     });
   }
-  
+
   if (!book) return;
 
-  const existingBook = library.find(b => b.title === unescapedTitle);
+  const existingBook = library.find((b) => b.title === unescapedTitle);
   if (existingBook) {
     existingBook.shelf = shelf;
     alert(`"${book.title}" moved to ${shelf}!`);
@@ -487,15 +521,18 @@ function addToLibrary(title, shelf) {
     library.unshift({ ...book, shelf });
     alert(`"${book.title}" added to ${shelf}!`);
   }
-  
+
+  saveLibraryToStorage();   
   loadHomePage();
   renderLibrary();
 
-    if (!detailView.classList.contains('hidden') && selectedBook === unescapedTitle) {
-    const safeTitle = unescapedTitle.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+  
+  if (!detailView.classList.contains("hidden")) {
+    const safeTitle = unescapedTitle
+      .replace(/'/g, "\\'")
+      .replace(/"/g, "&quot;");
     showBookDetail(safeTitle);
   }
-
 }
 
 function updateLibraryStats() {
@@ -549,7 +586,9 @@ function updateStars(rating) {
     }
   });
 }
-document.addEventListener('DOMContentLoaded', function() {
-  initEventListeners();
-  loadHomePage();
+document.addEventListener("DOMContentLoaded", function () {
+  loadLibraryFromStorage();   
+  initEventListeners();     
+  loadHomePage();             
+  renderLibrary();           
 });
